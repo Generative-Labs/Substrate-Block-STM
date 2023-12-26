@@ -1,0 +1,14 @@
+[workspace]
+resolver = "2"
+members = [
+    "parallel-executor"
+]
+
+[workspace.package]
+authors = ["Generative Labs"]
+edition = "2021"
+version = "0.1.0"
+
+[workspace.dependencies]
+# Substrate client dependencies
+sc-executor = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master" }
