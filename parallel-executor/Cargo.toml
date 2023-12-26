@@ -1,0 +1,20 @@
+[package]
+name = "parallel-executor"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+sp-api = { workspace = true }
+sp-blockchain = { workspace = true }
+sp-core = { workspace = true }
+sp-runtime = { workspace = true }
+sp-state-machine = { workspace = true }
+sp-trie = { workspace = true }
+sp-externalities = { workspace = true }
+sp-version = { workspace = true }
+
+sc-client-api = { workspace = true }
+sc-executor = { workspace = true }
+sc-service = { workspace = true }
