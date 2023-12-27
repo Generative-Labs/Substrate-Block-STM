@@ -18,3 +18,12 @@ sp-version = { workspace = true }
 sc-client-api = { workspace = true }
 sc-executor = { workspace = true }
 sc-service = { workspace = true }
+
+[dev-dependencies]
+criterion = { workspace = true, features = ["html_reports"]}
+substrate-test-runtime-client = { workspace = true }
+sp-keyring = { workspace = true }
+
+[[bench]]
+name = "extrinsics_codec"
+harness = false
