@@ -13,7 +13,6 @@
 /// In the future, we may need to conduct encoding and decoding checks for complex
 /// transactions to ensure that transaction encoding and decoding do not become performance
 /// bottlenecks.
-
 use criterion::{criterion_group, criterion_main, Criterion};
 use sp_keyring::AccountKeyring;
 use substrate_test_runtime_client::runtime::{Extrinsic, Transfer};
