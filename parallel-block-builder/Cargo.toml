@@ -1,0 +1,25 @@
+[package]
+name = "sc-parallel-block-builder"
+version = "0.1.0"
+edition = "2021"
+
+
+
+
+
+[dependencies]
+codec = { package = "parity-scale-codec", version = "3.6.1", features = [
+	"derive",
+] }
+sp-api = { workspace = true }
+sp-parallel-block-builder = { path = "../primitives/parallel-block-builder" }
+sp-blockchain = { workspace = true }
+sp-runtime = { workspace = true }
+sp-core = { workspace = true }
+sp-trie = { workspace = true }
+sp-inherents = { workspace = true }
+
+
+[dev-dependencies]
+sp-state-machine = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master" }
+substrate-test-runtime-client = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master"  }

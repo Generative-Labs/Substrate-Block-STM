@@ -1,7 +1,9 @@
 [workspace]
 resolver = "2"
 members = [
-    "parallel-executor"
+    "parallel-executor",
+    "parallel-block-builder",
+    "primitives/parallel-block-builder"
 ]
 
 [workspace.package]
@@ -22,6 +24,8 @@ sp-trie = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master
 sp-externalities = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master" }
 sp-version = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master" }
 sp-keyring = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master" }
+sp-inherents = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master"  }
+
 
 # # Substrate client dependencies
 sc-executor = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master" }
