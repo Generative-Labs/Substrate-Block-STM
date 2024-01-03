@@ -1,5 +1,5 @@
 [package]
-name = "sp-parallel-block-builder"
+name = "wp-block-builder"
 version = "0.1.0"
 edition = "2021"
 

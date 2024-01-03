@@ -19,7 +19,7 @@ use sp_runtime::{
 };
 use std::marker::PhantomData;
 
-pub use sp_parallel_block_builder::BlockBuilder as BlockBuilderApi;
+pub use wp_block_builder::BlockBuilder as BlockBuilderApi;
 use sp_trie::proof_size_extension::ProofSizeExt;
 
 /// A builder for creating an instance of [`BlockBuilder`].
