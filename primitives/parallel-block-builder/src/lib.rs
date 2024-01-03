@@ -15,7 +15,7 @@ sp_api::decl_runtime_apis! {
 		/// this block or not.
 		fn apply_extrinsic(extrinsic: <Block as BlockT>::Extrinsic) -> ApplyExtrinsicResult;
 
-		fn batch_apply_extrinsic(extrinsic: Vec<<Block as BlockT>::Extrinsic>) -> ApplyExtrinsicResult;
+		fn batch_apply_extrinsic(extrinsic: sp_std::vec::Vec<<Block as BlockT>::Extrinsic>) -> ApplyExtrinsicResult;
 
 		#[changed_in(6)]
 		fn apply_extrinsic(
@@ -24,7 +24,7 @@ sp_api::decl_runtime_apis! {
 
 		#[changed_in(6)]
 		fn batch_apply_extrinsic(
-			extrinsic: Vec<<Block as BlockT>::Extrinsic>,
+			extrinsic: sp_std::vec::Vec<<Block as BlockT>::Extrinsic>,
 		) -> sp_runtime::legacy::byte_sized_error::ApplyExtrinsicResult;
 
 		/// Finish the current block.

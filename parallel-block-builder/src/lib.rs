@@ -269,7 +269,7 @@ where
 	}
     /// Function: batch_push
     /// Description: This function is used to push extrinsics to the current transaction's extrinsics list and returns the result.
-	pub fn batch_push(&mut self, xts: Vec<<Block as BlockT>::Extrinsic>) -> Result<(), Error> {
+	pub fn batch_push(&mut self, xts: sp_std::vec::Vec<<Block as BlockT>::Extrinsic>) -> Result<(), Error> {
 		let parent_hash = self.parent_hash;
 		let extrinsics = &mut self.extrinsics;
 		let version = self.version;

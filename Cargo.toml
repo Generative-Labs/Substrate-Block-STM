@@ -6,13 +6,13 @@ members = [
     "primitives/parallel-block-builder",
     "example/node-template/runtime",
     "example/node-template/node",
-    "example/node-template/pallets/template",
 ]
 
 [workspace.package]
 authors = ["Generative Labs"]
 edition = "2021"
 version = "0.1.0"
+
 
 [workspace.dependencies]
 criterion = "0.3"
@@ -28,8 +28,8 @@ sp-externalities = { git = "https://github.com/paritytech/polkadot-sdk", branch 
 sp-version = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master" }
 sp-keyring = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master" }
 sp-inherents = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master"  }
-wp-block-builder = { path = "primitives/parallel-block-builder" }
-
+wp-block-builder = { path = "./primitives/parallel-block-builder" }
+wc-block-builder = { path = "./parallel-block-builder" }
 
 
 # # Substrate client dependencies
@@ -58,6 +58,23 @@ sc-basic-authorship = { git = "https://github.com/paritytech/polkadot-sdk", bran
 substrate-frame-rpc-system = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master" }
 pallet-transaction-payment-rpc = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master" }
 frame-support = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
+
+pallet-aura = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master" , default-features = false }
+pallet-balances = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
+pallet-grandpa = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
+pallet-sudo = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
+#frame-system = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
+pallet-timestamp = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
+#pallet-transaction-payment = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
+frame-executive = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
+#sp-api = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
+
+sp-offchain = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
+sp-session = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
+sp-std = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
+sp-storage = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
+sp-transaction-pool = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
+sp-genesis-builder = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
 
 
 # These dependencies are used for runtime benchmarking
