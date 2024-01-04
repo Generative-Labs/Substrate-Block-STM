@@ -18,6 +18,8 @@ sp-runtime = { workspace = true }
 sp-core = { workspace = true }
 sp-trie = { workspace = true }
 sp-inherents = { workspace = true }
+sp-std = { workspace = true }
+
 
 
 [dev-dependencies]
