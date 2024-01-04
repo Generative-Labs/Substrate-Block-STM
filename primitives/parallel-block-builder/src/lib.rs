@@ -17,16 +17,6 @@ sp_api::decl_runtime_apis! {
 
 		fn batch_apply_extrinsic(extrinsic: sp_std::vec::Vec<<Block as BlockT>::Extrinsic>) -> ApplyExtrinsicResult;
 
-		#[changed_in(6)]
-		fn apply_extrinsic(
-			extrinsic: <Block as BlockT>::Extrinsic,
-		) -> sp_runtime::legacy::byte_sized_error::ApplyExtrinsicResult;
-
-		#[changed_in(6)]
-		fn batch_apply_extrinsic(
-			extrinsic: sp_std::vec::Vec<<Block as BlockT>::Extrinsic>,
-		) -> sp_runtime::legacy::byte_sized_error::ApplyExtrinsicResult;
-
 		/// Finish the current block.
 		#[renamed("finalise_block", 3)]
 		fn finalize_block() -> <Block as BlockT>::Header;

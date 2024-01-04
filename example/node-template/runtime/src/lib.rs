@@ -345,7 +345,7 @@ impl_runtime_apis! {
 		}
 	}
 
-	impl wp_block_builder::BlockBuilder<Block> for Runtime {
+	impl sp_block_builder::BlockBuilder<Block> for Runtime {
 		fn apply_extrinsic(extrinsic: <Block as BlockT>::Extrinsic) -> ApplyExtrinsicResult {
 			Executive::apply_extrinsic(extrinsic)
 		}
@@ -354,9 +354,9 @@ impl_runtime_apis! {
 			Executive::finalize_block()
 		}
 
-		fn batch_apply_extrinsic(_extrinsic: sp_std::vec::Vec<<Block as BlockT>::Extrinsic>) -> ApplyExtrinsicResult{
-			unimplemented!()
-		}
+// 		fn batch_apply_extrinsic(_extrinsic: sp_std::vec::Vec<<Block as BlockT>::Extrinsic>) -> ApplyExtrinsicResult{
+// 			unimplemented!()
+// 		}
 
 		fn inherent_extrinsics(data: sp_inherents::InherentData) -> Vec<<Block as BlockT>::Extrinsic> {
 			data.create_extrinsics()

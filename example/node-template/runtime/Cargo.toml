@@ -29,7 +29,8 @@ pallet-timestamp = { git = "https://github.com/paritytech/polkadot-sdk", branch 
 pallet-transaction-payment = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
 frame-executive = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
 sp-api = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
-wp-block-builder = { path = "../../../primitives/parallel-block-builder" , default-features = false }
+#wp-block-builder = { path = "../../../primitives/parallel-block-builder" , default-features = false }
+sp-block-builder = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false }
 sp-consensus-aura = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false, features = ["serde"] }
 sp-consensus-grandpa = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false, features = ["serde"] }
 sp-core = { git = "https://github.com/paritytech/polkadot-sdk", branch = "master", default-features = false, features = ["serde"] }
@@ -77,7 +78,7 @@ std = [
 	"scale-info/std",
 	"serde_json/std",
 	"sp-api/std",
-	"wp-block-builder/std",
+	"sp-block-builder/std",
 	"sp-consensus-aura/std",
 	"sp-consensus-grandpa/std",
 	"sp-core/std",
