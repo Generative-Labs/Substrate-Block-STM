@@ -1,19 +1,52 @@
 use std::marker::PhantomData;
+use std::cell::RefCell;
+use std::collections::HashMap;
+use std::sync::Arc;
 
 use hash_db::Hasher;
+use sp_core::storage::ChildInfo;
 use sp_externalities::{ExtensionStore, Externalities};
-use sp_state_machine::backend::Backend;
+use sp_state_machine::{backend::Backend, StorageKey, StorageValue};
 
-use crate::mv_overlyed_changes::MVOverlyedChanges;
+use crate::types::*;
+use crate::mvhashmap::MVHashMap;
 
-/// Wraps a read-only backend, and mv hashmap for current change.
+
+pub(crate) enum DataRead<V> {
+    // Version supercedes V comparison.
+    Versioned(Version, Arc<V>),
+    Metadata,
+    Exists(bool),
+}
+
+pub(crate) struct CapturedReads {
+    data_reads: HashMap<StorageKey, DataRead<StorageValue>>,
+
+    incorrect_use: bool,
+}
+
+// ParallelState represents the set of read and write operations recorded in memory 
+// during concurrent transaction execution. Each task has its own ParallelState. 
+// ParallelState is isolated during task execution.
+pub struct ParallelState {
+    top: MVHashMap<StorageKey, StorageValue>,
+    // child
+
+    // offchain
+
+    captured_reads: RefCell<CapturedReads>,
+
+    write_set: HashMap<StorageKey, StorageValue>,
+}
+
+/// A struct that represents a single block execution worker thread's view into the state,
 pub struct Ext<'a, H, B>
 where
     H: Hasher,
     B: 'a + Backend<H>,
 {
-    /// The overlayed changes to write to.
-    mv_overlay: &'a mut MVOverlyedChanges,
+    latest_state: &'a mut ParallelState,
+
     /// The storage backend to read from.
     backend: &'a B,
     /// Pseudo-unique id used for tracing.
@@ -21,6 +54,8 @@ where
     /// Extensions registered with this instance.
     #[cfg(feature = "std")]
     extensions: Option<OverlayedExtensions<'a>>,
+
+    txn_idx: TxnIndex,
 
     _phantom: PhantomData<H>,
 }

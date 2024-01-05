@@ -11,6 +11,7 @@ version = "0.1.0"
 
 [workspace.dependencies]
 criterion = "0.3"
+anyhow = "1.0.79"
 codec = { package = "parity-scale-codec", version = "3.6.1", default-features = false, features = ["derive", "max-encoded-len"] }
 
 # Substrate primitive dependencies

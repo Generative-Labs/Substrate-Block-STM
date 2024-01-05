@@ -15,8 +15,9 @@ use sp_state_machine::{OverlayedChanges, StorageKey};
 use sp_trie::StorageProof;
 
 pub mod ext;
-pub mod mv_overlyed_changes;
+pub mod mvhashmap;
 pub mod state_machine;
+pub mod types;
 
 /// ParallelExecutor enables parallel execution of batched Substrate transactions.
 /// It can be used as a replacement for the substrate `LocalCallExecutor`.
