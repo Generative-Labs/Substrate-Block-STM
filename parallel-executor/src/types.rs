@@ -1,6 +1,13 @@
+// Copyright © Aptos Foundation
+// SPDX-License-Identifier: Apache-2.0
+
+// Modifications and additional contributions by GenerativeLabs.
+// SPDX-License-Identifier: GPL-3.0-or-later
+
+use std::sync::Arc;
+
 pub type TxnIndex = u32;
 pub type Incarnation = u32;
-pub type ShiftedTxnIndex = u32;
 
 /// Custom error type representing storage version. Result<Index, StorageVersion>
 /// then represents either index of some type (i.e. TxnIndex, Version), or a
@@ -10,3 +17,170 @@ pub struct StorageVersion;
 
 // TODO: Find better representations for this, a similar one for TxnIndex.
 pub type Version = Result<(TxnIndex, Incarnation), StorageVersion>;
+
+#[derive(Clone, Copy, PartialEq)]
+pub(crate) enum Flag {
+    Done,
+    Estimate,
+}
+
+/// Returned as Err(..) when failed to read from the multi-version data-structure.
+#[derive(Debug, PartialEq, Eq)]
+pub enum MVDataError {
+    /// No prior entry is found.
+    Uninitialized,
+    /// A dependency on other transaction has been found during the read.
+    Dependency(TxnIndex),
+    /// Delta application failed, txn execution should fail.
+    DeltaApplicationFailure,
+}
+
+/// Returned as Ok(..) when read successfully from the multi-version data-structure.
+#[derive(Debug, PartialEq, Eq)]
+pub enum MVDataOutput<V> {
+    /// Information from the last versioned-write. Note that the version is returned
+    /// and not the data to avoid copying big values around.
+    Versioned(Version, Arc<V>),
+}
+
+// In order to store base vales at the lowest index, i.e. at index 0, without conflicting
+// with actual transaction index 0, the following struct wraps the index and internally
+// increments it by 1.
+#[derive(PartialEq, Eq, PartialOrd, Ord, Clone, Debug)]
+pub(crate) struct ShiftedTxnIndex {
+    idx: TxnIndex,
+}
+
+impl ShiftedTxnIndex {
+    pub fn new(real_idx: TxnIndex) -> Self {
+        Self { idx: real_idx + 1 }
+    }
+
+    pub(crate) fn idx(&self) -> Result<TxnIndex, StorageVersion> {
+        if self.idx > 0 { Ok(self.idx - 1) } else { Err(StorageVersion) }
+    }
+
+    pub(crate) fn zero() -> Self {
+        Self { idx: 0 }
+    }
+}
+
+/// The execution result of a transaction
+#[derive(Debug)]
+pub enum ExecutionStatus<O> {
+    /// Transaction was executed successfully.
+    Success(O),
+    /// Transaction hit a none recoverable error during execution, halt the execution and propagate
+    /// the error back to the caller.
+    Abort,
+    /// Transaction was executed successfully, but will skip the execution of the trailing
+    /// transactions in the list
+    SkipRest(O),
+}
+
+#[cfg(test)]
+pub(crate) mod test {
+    use std::fmt::Debug;
+    use std::hash::Hash;
+    use std::sync::Arc;
+
+    use aptos_aggregator::delta_change_set::serialize;
+    use aptos_types::access_path::AccessPath;
+    use aptos_types::executable::ModulePath;
+    use aptos_types::state_store::state_value::StateValue;
+    use aptos_types::write_set::TransactionWrite;
+    use bytes::Bytes;
+    use claims::{assert_err, assert_ok_eq};
+
+    use super::*;
+
+    #[derive(Clone, Eq, Hash, PartialEq, Debug)]
+    pub(crate) struct KeyType<K: Hash + Clone + Debug + Eq>(
+        /// Wrapping the types used for testing to add ModulePath trait implementation.
+        pub K,
+    );
+
+    impl<K: Hash + Clone + Eq + Debug> ModulePath for KeyType<K> {
+        fn module_path(&self) -> Option<AccessPath> {
+            None
+        }
+    }
+
+    #[test]
+    fn test_shifted_idx() {
+        let zero = ShiftedTxnIndex::zero();
+        let shifted_indices: Vec<_> = (0..20).map(ShiftedTxnIndex::new).collect();
+        for (i, shifted_idx) in shifted_indices.iter().enumerate() {
+            assert_ne!(zero, *shifted_idx);
+            for j in 0..i {
+                assert_ne!(ShiftedTxnIndex::new(j as TxnIndex), *shifted_idx);
+            }
+            assert_eq!(ShiftedTxnIndex::new(i as TxnIndex), *shifted_idx);
+        }
+        assert_eq!(ShiftedTxnIndex::zero(), zero);
+        assert_err!(zero.idx());
+
+        for (i, shifted_idx) in shifted_indices.into_iter().enumerate() {
+            assert_ok_eq!(shifted_idx.idx(), i as TxnIndex);
+        }
+    }
+
+    #[derive(Debug, PartialEq, Eq)]
+    pub(crate) struct TestValue {
+        bytes: Bytes,
+    }
+
+    impl TestValue {
+        pub(crate) fn deletion() -> Self {
+            Self { bytes: vec![].into() }
+        }
+
+        pub fn new(mut seed: Vec<u32>) -> Self {
+            seed.resize(4, 0);
+            Self { bytes: seed.into_iter().flat_map(|v| v.to_be_bytes()).collect() }
+        }
+
+        pub(crate) fn from_u128(value: u128) -> Self {
+            Self { bytes: serialize(&value).into() }
+        }
+
+        pub(crate) fn with_len(len: usize) -> Self {
+            assert!(len > 0, "0 is deletion");
+            Self { bytes: vec![100_u8; len].into() }
+        }
+    }
+
+    impl TransactionWrite for TestValue {
+        fn bytes(&self) -> Option<&Bytes> {
+            (!self.bytes.is_empty()).then_some(&self.bytes)
+        }
+
+        fn from_state_value(_maybe_state_value: Option<StateValue>) -> Self {
+            unimplemented!("Irrelevant for the test")
+        }
+
+        fn as_state_value(&self) -> Option<StateValue> {
+            unimplemented!("Irrelevant for the test")
+        }
+
+        fn set_bytes(&mut self, _bytes: Bytes) {
+            unimplemented!("Irrelevant for the test")
+        }
+    }
+
+    // Generate a Vec deterministically based on txn_idx and incarnation.
+    pub(crate) fn value_for(txn_idx: TxnIndex, incarnation: Incarnation) -> TestValue {
+        TestValue::new(vec![txn_idx * 5, txn_idx + incarnation, incarnation * 5])
+    }
+
+    // Generate the value_for txn_idx and incarnation in arc.
+    pub(crate) fn arc_value_for(txn_idx: TxnIndex, incarnation: Incarnation) -> Arc<TestValue> {
+        // Generate a Vec deterministically based on txn_idx and incarnation.
+        Arc::new(value_for(txn_idx, incarnation))
+    }
+
+    // Convert value for txn_idx and incarnation into u128.
+    pub(crate) fn u128_for(txn_idx: TxnIndex, incarnation: Incarnation) -> u128 {
+        value_for(txn_idx, incarnation).as_u128().unwrap().unwrap()
+    }
+}

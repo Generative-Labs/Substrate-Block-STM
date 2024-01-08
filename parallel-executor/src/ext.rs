@@ -1,43 +1,16 @@
-use std::marker::PhantomData;
 use std::cell::RefCell;
-use std::collections::HashMap;
-use std::sync::Arc;
+use std::marker::PhantomData;
 
 use hash_db::Hasher;
 use sp_core::storage::ChildInfo;
 use sp_externalities::{ExtensionStore, Externalities};
-use sp_state_machine::{backend::Backend, StorageKey, StorageValue};
+use sp_state_machine::backend::Backend;
+use sp_state_machine::{StorageKey, StorageValue};
 
-use crate::types::*;
-use crate::mvhashmap::MVHashMap;
-
-
-pub(crate) enum DataRead<V> {
-    // Version supercedes V comparison.
-    Versioned(Version, Arc<V>),
-    Metadata,
-    Exists(bool),
-}
-
-pub(crate) struct CapturedReads {
-    data_reads: HashMap<StorageKey, DataRead<StorageValue>>,
-
-    incorrect_use: bool,
-}
-
-// ParallelState represents the set of read and write operations recorded in memory 
-// during concurrent transaction execution. Each task has its own ParallelState. 
-// ParallelState is isolated during task execution.
-pub struct ParallelState {
-    top: MVHashMap<StorageKey, StorageValue>,
-    // child
-
-    // offchain
-
-    captured_reads: RefCell<CapturedReads>,
-
-    write_set: HashMap<StorageKey, StorageValue>,
-}
+use crate::captured_reads::CapturedReads;
+use crate::txn_last_input_output::TxnLastInputOutput;
+use crate::types::TxnIndex;
+use crate::versioned_data::VersionedData;
 
 /// A struct that represents a single block execution worker thread's view into the state,
 pub struct Ext<'a, H, B>
@@ -45,10 +18,13 @@ where
     H: Hasher,
     B: 'a + Backend<H>,
 {
-    latest_state: &'a mut ParallelState,
+    latest_state: ParallelState<'a>,
+
+    last_input_output: &'a TxnLastInputOutput,
 
     /// The storage backend to read from.
     backend: &'a B,
+
     /// Pseudo-unique id used for tracing.
     pub id: u16,
     /// Extensions registered with this instance.
@@ -58,6 +34,12 @@ where
     txn_idx: TxnIndex,
 
     _phantom: PhantomData<H>,
+}
+
+pub struct ParallelState<'a> {
+    versioned_top: &'a VersionedData<StorageKey, StorageValue>,
+
+    captured_reads: RefCell<CapturedReads<StorageKey, StorageValue>>,
 }
 
 impl<'a, H, B> Externalities for Ext<'a, H, B>

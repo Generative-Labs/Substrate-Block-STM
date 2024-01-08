@@ -14,10 +14,12 @@ use sp_runtime::traits::{Block as BlockT, HashingFor};
 use sp_state_machine::{OverlayedChanges, StorageKey};
 use sp_trie::StorageProof;
 
+pub mod captured_reads;
 pub mod ext;
-pub mod mvhashmap;
 pub mod state_machine;
+pub mod txn_last_input_output;
 pub mod types;
+pub mod versioned_data;
 
 /// ParallelExecutor enables parallel execution of batched Substrate transactions.
 /// It can be used as a replacement for the substrate `LocalCallExecutor`.
