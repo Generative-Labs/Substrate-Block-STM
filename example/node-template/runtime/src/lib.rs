@@ -370,6 +370,31 @@ impl_runtime_apis! {
 		}
 	}
 
+	impl wp_block_builder::ParallelBlockBuilder<Block> for Runtime {
+		fn batch_apply_extrinsic(_extrinsic: sp_std::vec::Vec<<Block as BlockT>::Extrinsic>) -> ApplyExtrinsicResult{
+			unimplemented!()
+		}
+
+		fn apply_extrinsic(extrinsic: <Block as BlockT>::Extrinsic) -> ApplyExtrinsicResult {
+			Executive::apply_extrinsic(extrinsic)
+		}
+
+		fn finalize_block() -> <Block as BlockT>::Header {
+			Executive::finalize_block()
+		}
+
+		fn inherent_extrinsics(data: sp_inherents::InherentData) -> Vec<<Block as BlockT>::Extrinsic> {
+			data.create_extrinsics()
+		}
+
+		fn check_inherents(
+			block: Block,
+			data: sp_inherents::InherentData,
+		) -> sp_inherents::CheckInherentsResult {
+			data.check_extrinsics(&block)
+		}
+	}
+
 	impl sp_transaction_pool::runtime_api::TaggedTransactionQueue<Block> for Runtime {
 		fn validate_transaction(
 			source: TransactionSource,

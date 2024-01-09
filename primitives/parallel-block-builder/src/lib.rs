@@ -1,6 +1,6 @@
 //! The block builder runtime api.
 
-#![cfg_attr(not(feature = "std"), no_std)]
+//#![cfg_attr(not(feature = "std"), no_std)]
 
 use sp_inherents::{CheckInherentsResult, InherentData};
 use sp_runtime::{traits::Block as BlockT, ApplyExtrinsicResult};
@@ -8,7 +8,7 @@ use sp_runtime::{traits::Block as BlockT, ApplyExtrinsicResult};
 sp_api::decl_runtime_apis! {
 	/// The `BlockBuilder` api trait that provides the required functionality for building a block.
 	#[api_version(6)]
-	pub trait BlockBuilder {
+	pub trait ParallelBlockBuilder {
 		/// Apply the given extrinsic.
 		///
 		/// Returns an inclusion outcome which specifies if this extrinsic is included in
