@@ -16,7 +16,9 @@ use sp_trie::StorageProof;
 
 pub mod captured_reads;
 pub mod ext;
+pub mod scheduler;
 pub mod state_machine;
+pub mod sync_wrapper;
 pub mod txn_last_input_output;
 pub mod types;
 pub mod versioned_data;
